@@ -29,7 +29,20 @@ async fn main() -> Result<(), Error> {
     let producer_config = Arc::clone(&config);
     let inital_topic_list = config.inital_topic_list.clone();
 
-  
+    ////////////////////////
+    // 2. Start worker pool.
+    ////////////////////////
+
+    tokio::spawn(async move {
+        let workers = Workers::init(worker_config);
+        let _ = workers.consume(inital_topic_list).await;
+    });
+
+    /////////////////////////////////
+    // 3. Start producer and its API.
+    /////////////////////////////////
+
+    Server::new().start_task_pool(producer_config).await;
 
     Ok(())
 }
