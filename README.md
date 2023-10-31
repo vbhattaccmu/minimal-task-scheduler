@@ -1,11 +1,7 @@
 ## Task Scheduler
 
-This task is designed to serve as a practical demonstration of your proficiency in the Rust programming language and your expertise in microservices architecture. This task assumes that you already have a task scheduler written in Rust:
-
-- The task scheduler consists of two sets of microservices; the first set being the service that generates tasks (can generate randomly or manually be added by the user) and broadcasts them onto a Kafka queue, under a set of topics.
-- The second set of microservices processes these tasks as a worker pool, as it consists of identical microservices, and ensures that the load is effectively balanced among the services.
-
-The `task-scheduler` crate consists of the following modules:
+A `task-scheduler` is designed to showcase consumer worker pools can be managed to balance work loads while reading messages published
+from a producer. The crate consists of the following modules:
 
 1. `producer.rs` -> The producer module.
    - The producer module generates tasks and publishes them to a list of topics using the `produce_messages` method.
