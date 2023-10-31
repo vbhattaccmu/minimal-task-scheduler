@@ -4,23 +4,25 @@ A `task-scheduler` is designed to showcase how consumer worker pools can be mana
 from a producer. The crate consists of the following modules:
 
 1. `producer.rs` -> The producer module.
+
    - The producer module generates tasks and publishes them to a list of topics using the `produce_messages` method.
    - The producer also hosts an API to add tasks to the worker pool using the `start_task_pool` method.
 
 2. `consumer.rs` -> The consumer worker pool module.
+
    - The worker pool hosts a set of consumers to consume messages from a set of topics using the `consume` method.
    - The worker pool load balancing strategy includes the following features:
-   - Each consumer is assigned a group ID, allowing a consumer within a group to process messages from a topic 
+   - Each consumer is assigned a group ID, allowing a consumer within a group to process messages from a topic
      partition using the `process` method.
-   - Each consumer in a group is allowed to subscribe to a topic partition for a certain amount of time. Once the 
+   - Each consumer in a group is allowed to subscribe to a topic partition for a certain amount of time. Once the
      timer elapses, another consumer from the same group is allowed to subscribe from where the previous member left off. This is done to maintain **optimal CPU load** of each consumer in a group. If all consumers in a group have processed messages from a topic, the offset is saved and the next topic is processed.
 
 3. `config.rs` -> A module for reading configuration from a TOML file.
 
 4. `error.rs` -> A module for returning human-readable error messages from the system.
 
-5. `main.rs` -> The entry point to the task scheduler. It reads the configuration, sets up the producer and 
-                consumer worker pool.
+5. `main.rs` -> The entry point to the task scheduler. It reads the configuration, sets up the producer and
+   consumer worker pool.
 
 ### Ensuring Sequential Execution of Tasks within a Specific Topic
 
@@ -51,6 +53,7 @@ After the timer elapses, the next consumer in the group picks up where the previ
 ## How to start the service
 
 This step requires you to install and configure a kafka broker.
+
 - First, make sure you have [Docker](https://docs.docker.com/engine/install/) and the [Docker Compose plugin](https://docs.docker.com/compose/install/linux/) installed:
 - Second you will need to install Rust. For more information see [here](https://www.rust-lang.org/tools/install).
 - Follow the next steps elucidated below:
@@ -66,15 +69,17 @@ Docker Compose version v2.20.2
 
 ### Step 2
 
-Then simply perform 
+Then simply perform
+
 ```sh
 docker compose up -d
 ```
+
 This will set up Kafka and Zookeeper
 
 ### Step 3
 
-Build the binary from `task-scheduler` directory: 
+Build the binary from `task-scheduler` directory:
 
 ```sh
 cargo build --release
@@ -85,12 +90,12 @@ cargo build --release
 The `task-scheduler` binary can be executed from target/release using:
 
 ```sh
- ./task-scheduler 
+ ./task-scheduler
 ```
 
-### Add tasks 
+### Add tasks
 
-The API to add a task can be accessed as follows: 
+The API to add a task can be accessed as follows:
 
 ```sh
 curl --location 'http://localhost:5000/tasks/generate' \
@@ -102,6 +107,7 @@ curl --location 'http://localhost:5000/tasks/generate' \
 ```
 
 Response:
+
 ```sh
 "Success"
 ```
@@ -115,6 +121,7 @@ The API to list tasks left to be broadcasted from producer
 ```
 
 Response:
+
 ```sh
 [
     {
@@ -131,7 +138,7 @@ Response:
 
 ### Logs from scheduler
 
-The output would from task scheduler would look something like this:- 
+The output would from task scheduler would look something like this:-
 
 ```sh
 Future completed. Result: Ok((0, 20))

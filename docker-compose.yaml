@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 
 services:
   zookeeper:
@@ -10,7 +10,7 @@ services:
       - 22181:2181
     networks:
       - scheduler_network
-  
+
   kafka:
     image: confluentinc/cp-kafka:latest
     depends_on:
@@ -26,6 +26,6 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     networks:
       - scheduler_network
-      
+
 networks:
   scheduler_network:
