@@ -1,0 +1,11 @@
+title = "task-scheduler"
+
+producer_timeout = 5000
+consumer_timeout = 6000
+query_timeout = 5
+brokers = ["localhost:29092"]
+inital_topic_list = ["A", "B", "C", "D"]
+enable_auto_commit = true
+num_workers = 4
+num_groups = 4
+listening_port = 5000
