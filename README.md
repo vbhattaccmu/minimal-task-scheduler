@@ -1,6 +1,6 @@
-## Task Scheduler
+## Workload Scheduler
 
-A `task-scheduler` is designed to showcase how consumer worker pools can be managed to balance work loads while reading messages published
+A scheduler is designed to showcase how consumer worker pools can be managed to balance work loads while reading messages published
 from a producer. The crate consists of the following modules:
 
 1. `producer.rs` -> The producer module.
