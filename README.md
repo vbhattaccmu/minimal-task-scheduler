@@ -1,4 +1,4 @@
-## Workload Scheduler
+## Task Scheduler
 
 A scheduler is designed to showcase how consumer worker pools can be managed to balance work loads while reading messages published
 from a producer. The crate consists of the following modules:
