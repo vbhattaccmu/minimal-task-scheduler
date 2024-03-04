@@ -1,0 +1,34 @@
+version: '3.8'
+networks:
+  pulsar:
+    driver: bridge
+services:
+  pulsar-server:
+    # https://pulsar.apache.org/docs/en/standalone-docker/
+    hostname: pulsar-server
+    entrypoint: "bin/pulsar standalone"
+    networks:
+      - pulsar
+    image: apachepulsar/pulsar:2.6.0
+    # restart: always
+    volumes:
+      - type: bind
+        source: ./data
+        target: /pulsar/data
+        volume:
+          nocopy: true
+      - type: bind
+        source: ./conf
+        target: /pulsar/conf
+        volume:
+          nocopy: true
+    ports:
+      - 46650:6650
+      - 48080:8080
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://pulsar-server:8080/metrics/"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 120s
+  
