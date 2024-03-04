@@ -28,12 +28,12 @@ impl DeserializeMessage for Task {
 pub(crate) struct Workers {
     timeout: u64,
     group_ids: Vec<usize>,
-    consumer: Consumer<Task, _>,
+    consumer: Consumer<Task, TokioExecutor>,
 }
 
 impl Workers {
     /// `init` creates a Worker Pool.
-    pub(crate) fn init(config: Arc<Config>) -> Self {
+    pub(crate) async fn init(config: Arc<Config>) -> Self {
         let addr = env::var("PULSAR_ADDRESS")
         .ok()
         .unwrap_or_else(|| "pulsar://127.0.0.1:6650".to_string());
@@ -57,7 +57,7 @@ impl Workers {
             ));
         }
 
-        let pulsar: Pulsar<_> = builder.build().await?;
+        let pulsar: Pulsar<_> = builder.build().await.unwrap();
 
         let mut consumer: Consumer<Task, _> = pulsar
             .consumer()
@@ -66,19 +66,19 @@ impl Workers {
             .with_subscription_type(SubType::Exclusive)
             .with_subscription("test_subscription")
             .build()
-            .await?;
+            .await.unwrap();
 
         Workers {
-            group_ids,
+            group_ids: vec![],
             consumer,
             timeout: config.consumer_timeout,
         }
     }
 
-    pub(crate) async fn consume(&self, topics: Vec<String>) -> Result<(), Error> {
+    pub(crate) async fn consume(&mut self, topics: Vec<String>) -> Result<(), Error> {
         let mut counter = 0usize;
-        while let Some(msg) = consumer.try_next().await? {
-            consumer.ack(&msg).await?;
+        while let Some(msg) = self.consumer.try_next().await.expect("") {
+            self.consumer.ack(&msg).await.unwrap();
             log::info!("metadata: {:?}", msg.metadata());
             log::info!("id: {:?}", msg.message_id());
             let data = match msg.deserialize() {
@@ -89,15 +89,15 @@ impl Workers {
                 }
             };
     
-            if data.data.as_str() != "data" {
-                log::error!("Unexpected payload: {}", &data.data);
+            if data.message.as_str() != "data" {
+                log::error!("Unexpected payload: {}", &data.message);
                 break;
             }
             counter += 1;
             log::info!("got {} messages", counter);
     
             if counter > 10 {
-                consumer.close().await.expect("Unable to close consumer");
+                self.consumer.close().await.expect("Unable to close consumer");
                 break;
             }
         }
@@ -105,6 +105,3 @@ impl Workers {
         Ok(())
     }
 }
-
-// A type alias with your custom consumer can be created for convenience.
-type LoggingConsumer = StreamConsumer<CustomContext>;

@@ -121,7 +121,7 @@ impl Server {
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub(crate) struct Task {
     topic: String,
-    message: String,
+    pub message: String,
 }
 
 #[derive(Debug)]
@@ -180,10 +180,10 @@ impl Producer {
             ));
         }
 
-        let pulsar: Pulsar<_> = builder.build().await?;
+        let pulsar: Pulsar<_> = builder.build().await.unwrap();
         let mut producer = pulsar
             .producer()
-            .with_topic(topic)
+            .with_topic(topic.clone())
             .with_name("my producer")
             .with_options(producer::ProducerOptions {
                 schema: Some(proto::Schema {
@@ -193,7 +193,7 @@ impl Producer {
                 ..Default::default()
             })
             .build()
-            .await?;
+            .await.unwrap();
 
         let mut counter = 0usize;
         let query_timeout = config.clone().query_timeout;
@@ -202,10 +202,10 @@ impl Producer {
         loop {
             producer
                 .send(Task {
-                    topic,
+                    topic: topic.clone(),
                     message: "a".to_string(),
                 })
-                .await?
+                .await.unwrap()
                 .await
                 .unwrap();
 
@@ -215,7 +215,6 @@ impl Producer {
 
             if counter > 10 {
                 producer.close().await.expect("Unable to close connection");
-                break;
             }
         }
     }

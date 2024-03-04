@@ -35,7 +35,7 @@ async fn main() -> Result<(), Error> {
 
     tokio::spawn(async move {
         let workers = Workers::init(worker_config);
-        let _ = workers.consume(inital_topic_list).await;
+        let _ = workers.await.consume(inital_topic_list).await;
     });
 
     /////////////////////////////////
